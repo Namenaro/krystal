@@ -27,15 +27,11 @@ class Situation:
     #  -- для  обучения --------------------------------------------
     def init_grower_from_point(self, point): # автоопределение родителя, автоопеределение бассейна, вал
         parent_cristall_name = self.get_best_cristall_name_for_point(point)
-        if parent_cristall_name is None:
-            bassin = self.get_bassin_no_cristalls()
-            allowed_points = self.get_allowed_points_no_cristalls(point)
-        else:
-            parent_cristall = self.names_to_crystalls[parent_cristall_name]
-            bassin = self.get_bassin_by_cristall(parent_cristall)
-            allowed_points = parent_cristall.get_points()
-        grower = OneKristalGrower(point, allowed_points, bassin)
 
+        allowed_points = self.get_allowed_points(parent_cristall_name, point)
+        bassin = self.get_bassin(parent_cristall_name)
+
+        grower = OneKristalGrower(point, allowed_points, bassin)
         return parent_cristall_name, grower
 
     def get_worst_point(self):
@@ -50,7 +46,7 @@ class Situation:
                 point_err_worst = err_in_point
                 point_index_worst = point
             else:
-                if point_err_worst< err_in_point:
+                if point_err_worst < err_in_point:
                     point_err_worst = err_in_point
                     point_index_worst = point
 
@@ -59,6 +55,20 @@ class Situation:
 
     #  -- для распознавания по предсказанию ------------------------
     def init_grower_from_typo(self, typo):
+        parent_name = typo.parent_name
+
+        # получить разрешенные точки
+        allowed_points = self.get_allowed_points(parent_name, typo.point)
+
+        # получить бассейн
+        bassin = self.get_bassin(parent_name)
+
+        # на разрешенных точках посчитать в каждой win предсказанного значения val над значением бассейна
+        wins =
+
+        # выбрать из разрешенных них ближайшую к предсказаной точку с положиетльной win
+        start_point =
+        grower = OneKristalGrower(start_point, allowed_points, bassin)
 
         return parent_name, grower
 
@@ -75,6 +85,58 @@ class Situation:
 
     #-----------------------------------------------------------
     #----------------------------------------------------------
+    def get_allowed_points_no_cristalls(self, point):
+        # ищем слева и справа от точки ближайший кристалл или границу сигнала
+        left = point
+        while True:
+            if left == 0:
+                break
+            left -=1
+            names = self.points_to_cristalls_names[left]
+            if len(names) > 0:
+                left +=1
+                break
+
+        right = point
+        while True:
+            if right == len(self.full_signal) -1:
+                break
+            right +=1
+            names = self.points_to_cristalls_names[right]
+            if len(names) > 0:
+                right -= 1
+                break
+        return list([range(left, right+1)])
+
+    def get_allowed_points(self, parent_name, point):
+        if parent_name is None:
+            allowed_points = self.get_allowed_points_no_cristalls(point)
+        else:
+            parent_cristall = self.names_to_crystalls[parent_name]
+            allowed_points = parent_cristall.get_points()
+        return allowed_points
+
+    def get_bassin(self, parent_name):
+        if parent_name is None:
+            return self.get_bassin_no_cristalls()
+        parent_cristall = self.names_to_crystalls[parent_name]
+        points = parent_cristall.get_points() # точки базового кристалла и составляют басейн
+        vals = list([self.full_signal[point] for point in points])
+        bassin = Bassin(vals = vals, global_indexes=points)
+        return bassin
+
+
+    def get_bassin_no_cristalls(self):
+        vals = []
+        indexes = []
+        for point, names in self.points_to_cristalls_names.items():
+            if len(names) == 0:
+                vals.append(self.full_signal[point])
+                indexes.append(point)
+        bassin = Bassin(vals, indexes)
+        return bassin
+
+
     def induse_cristalls_childen(self, parent_name, cristall):
         central_crisstall = init_cristall_from_points(full_signal=self.full_signal, points= cristall.get_points())
         children = [central_crisstall]
