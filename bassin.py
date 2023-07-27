@@ -13,4 +13,6 @@ class Bassin:
 
     def get_auto_prediction(self):
         return statistics.mean(self.indexes_to_vals.values())
-        
+
+    def get_val(self, global_index):
+        return self.indexes_to_vals[global_index]
