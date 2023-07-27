@@ -26,7 +26,17 @@ class Situation:
 
     #  -- для  обучения --------------------------------------------
     def init_grower_from_point(self, point): # автоопределение родителя, автоопеределение бассейна, вал
-        return parent_name, grower
+        parent_cristall_name = self.get_best_cristall_name_for_point(point)
+        if parent_cristall_name is None:
+            bassin = self.get_bassin_no_cristalls()
+            allowed_points = self.get_allowed_points_no_cristalls(point)
+        else:
+            parent_cristall = self.names_to_crystalls[parent_cristall_name]
+            bassin = self.get_bassin_by_cristall(parent_cristall)
+            allowed_points = parent_cristall.get_points()
+        grower = OneKristalGrower(point, allowed_points, bassin)
+
+        return parent_cristall_name, grower
 
 
     #  -- для распознавания по предсказанию ------------------------
@@ -68,12 +78,18 @@ class Situation:
     def induse_cristalls_childen(self, parent_name, cristall):
         return children
 
-    def get_best_cristall_for_point(self, point):
+    def get_bassin_by_cristall(self, parent_cristall):
+        global_indexes = parent_cristall.get_points()
+        vals = parent_cristall.get_vals()
+        bassin = Bassin(vals, global_indexes)
+        return bassin
+
+    def get_best_cristall_name_for_point(self, point):
         names = self.points_to_cristalls_names[point]
         if len(names) == 0:
             return None
         best_cristall_name = names[-1]
-        return self.names_to_crystalls[best_cristall_name]
+        return best_cristall_name
 
     def register_crystall_no_modification(self, cristall):
         cristal_id = self.names_gen.generate_id()

@@ -20,3 +20,6 @@ class Cristall:
 
     def get_points(self):
         return self.indexes
+
+    def get_vals(self):
+        return self.vals
