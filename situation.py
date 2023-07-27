@@ -18,13 +18,29 @@ class Situation:
 
         self.names_gen = IdsGen()
 
-    def add_crystall(self, cristall):
+    def init_grower_from_point(self, point):
+        return parent_name, grower
+
+    def add_crystall(self, parent_name, crystall):
+        pass
+
+    def init_grower_from_val_and_point(self, point, val):
+        return parent_name, grower
+
+    def get_worst_point(self):
+        return index
+
+    #-----------------------------------------------------------
+    #----------------------------------------------------------
+
+    def register_crystall_no_modification(self, cristall):
         cristal_id = self.names_gen.generate_id()
         self.names_to_crystalls[cristal_id] = cristall
-        self.register_ctystall_to_points(cristall.get_points(), cristal_id)
+
+        for cristal_point in cristall.get_points():
+            self.points_to_cristalls_names[cristal_point].append(cristal_id)
 
 
-    def register_ctystall_to_points(self, cristall_points, name):
-        for cristal_point in cristall_points:
-            self.points_to_cristalls_names[cristal_point].append(name)
+
+
 
