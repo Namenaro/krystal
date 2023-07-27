@@ -1,6 +1,9 @@
 from bassin import Bassin
+from cristall import Cristall
 
 import statistics
+
+
 
 class OneKristalGrower:
     def __init__(self, start_point, allowed_global_indexes, bassin):
@@ -36,6 +39,16 @@ class OneKristalGrower:
         vals = list([self.bassin.get_val(i) for i in self.crystal_points])
         return vals
 
+    def get_cystal_points(self):
+        return self.crystal_points
+
+    def get_crystall_obj(self):
+        indexes = self.crystal_points
+        vals = self.get_krystal_vals()
+        wins = self.get_wins()
+        cristall = Cristall(indexes, vals, wins)
+        return cristall
+
     def get_krystal_prediction(self):
         kristal_vals = self.get_krystal_vals()
         return statistics.mean(kristal_vals)
@@ -48,6 +61,16 @@ class OneKristalGrower:
         abs_err_new = abs(new_prediction - real_val)
         win = abs_err_old - abs_err_new
         return win
+
+    def get_wins(self):
+        auto_prediction = self.bassin.get_auto_prediction()
+        krystal_prediction = self.get_krystal_prediction()
+        wins = []
+        for i in self.crystal_points:
+            win = self.check_win_in_point(i, old_prediction=auto_prediction, new_prediction=krystal_prediction)
+            wins.append(win)
+        return wins
+
 
 
     def grow_step(self):
