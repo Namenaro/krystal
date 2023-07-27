@@ -45,8 +45,7 @@ class OneKristalGrower:
     def get_crystall_obj(self):
         indexes = self.crystal_points
         vals = self.get_krystal_vals()
-        wins = self.get_wins()
-        cristall = Cristall(indexes, vals, wins)
+        cristall = Cristall(indexes, vals)
         return cristall
 
     def get_krystal_prediction(self):
@@ -70,7 +69,6 @@ class OneKristalGrower:
             win = self.check_win_in_point(i, old_prediction=auto_prediction, new_prediction=krystal_prediction)
             wins.append(win)
         return wins
-
 
 
     def grow_step(self):

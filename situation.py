@@ -1,7 +1,7 @@
 from grower import OneKristalGrower
 from bassin import Bassin
 from utils import IdsGen
-from cristall import Cristall
+from cristall import Cristall, init_cristall_from_points
 
 
 class Typo:
@@ -38,29 +38,12 @@ class Situation:
 
         return parent_cristall_name, grower
 
-
-    #  -- для распознавания по предсказанию ------------------------
-    def init_grower_from_typo(self, typo):
-
-        return parent_name, grower
-
-    def add_crystall(self, parent_name, cristall):
-        if parent_name is None:
-            self.register_crystall_no_modification(cristall)
-        else:
-            cristalls = self.induse_cristalls_childen(parent_name, cristall)
-            for crist in cristalls:
-                self.register_crystall_no_modification(crist)
-
-
-    def add_cristall_no_parent(self, cristall):
-        self.register_crystall_no_modification(cristall)
-
     def get_worst_point(self):
         point_err_worst = None
         point_index_worst = None
         for point in range(len(self.full_signal)):
-            latest_cristall = self.get_best_cristall_for_point(point)
+            latest_cristall_name = self.get_best_cristall_name_for_point(point)
+            latest_cristall =self.names_to_crystalls[latest_cristall_name]
             err_in_point = latest_cristall.get_err_in_point(point)
 
             if point_err_worst is None:
@@ -73,9 +56,40 @@ class Situation:
 
         return point_index_worst
 
+
+    #  -- для распознавания по предсказанию ------------------------
+    def init_grower_from_typo(self, typo):
+
+        return parent_name, grower
+
+    # -- для добавления результатов распознавания в ситуацию
+
+    def add_crystall(self, parent_name, cristall):
+        if parent_name is None:
+            self.register_crystall_no_modification(cristall)
+        else:
+            cristalls = self.induse_cristalls_childen(parent_name, cristall)
+            for crist in cristalls:
+                self.register_crystall_no_modification(crist)
+
+
     #-----------------------------------------------------------
     #----------------------------------------------------------
     def induse_cristalls_childen(self, parent_name, cristall):
+        central_crisstall = init_cristall_from_points(full_signal=self.full_signal, points= cristall.get_points())
+        children = [central_crisstall]
+        b1 = cristall.get_b1()
+        if b1 >0:
+            left_child_points = list(range(0, b1))
+            left_child = init_cristall_from_points(self.full_signal, points=left_child_points)
+            children.append(left_child)
+
+        b2 = cristall.get_b2()
+        if b2 < len(cristall.get_points())-1:
+            right_child_points = list(range(b2, len(cristall.get_points())))
+            right_child = init_cristall_from_points(self.full_signal, points=right_child_points)
+            children.append(right_child)
+
         return children
 
     def get_bassin_by_cristall(self, parent_cristall):
