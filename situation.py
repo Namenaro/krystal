@@ -4,6 +4,11 @@ from utils import IdsGen
 from cristall import Cristall
 
 
+class Typo:
+    def __init__(self, parent_name, point, val):
+        self.parent_name = parent_name
+        self.point = point
+        self.val = val
 
 
 class Situation:
@@ -18,14 +23,28 @@ class Situation:
 
         self.names_gen = IdsGen()
 
-    def init_grower_from_point(self, point):
+
+    #  -- для  обучения --------------------------------------------
+    def init_grower_from_point(self, point): # автоопределение родителя, автоопеределение бассейна, вал
         return parent_name, grower
 
-    def add_crystall(self, parent_name, crystall):
-        pass
 
-    def init_grower_from_val_and_point(self, point, val):
+    #  -- для распознавания по предсказанию ------------------------
+    def init_grower_from_typo(self, typo):
+
         return parent_name, grower
+
+    def add_crystall(self, parent_name, cristall):
+        if parent_name is None:
+            self.register_crystall_no_modification(cristall)
+        else:
+            cristalls = self.induse_cristalls_childen(parent_name, cristall)
+            for crist in cristalls:
+                self.register_crystall_no_modification(crist)
+
+
+    def add_cristall_no_parent(self, cristall):
+        self.register_crystall_no_modification(cristall)
 
     def get_worst_point(self):
         point_err_worst = None
@@ -46,6 +65,9 @@ class Situation:
 
     #-----------------------------------------------------------
     #----------------------------------------------------------
+    def induse_cristalls_childen(self, parent_name, cristall):
+        return children
+
     def get_best_cristall_for_point(self, point):
         names = self.points_to_cristalls_names[point]
         if len(names) == 0:
